@@ -81,4 +81,4 @@ If you wish to contribute to the project, please fork the repository and create 
 
 ## Contact
 
-For further information or questions, feel free to contact the project team at arpitmarkana4887@gmail.com.
+For further information or questions, feel free to contact the project team at arpitmarkana4887@gmail.com or mysticalmanav@gmail.com
