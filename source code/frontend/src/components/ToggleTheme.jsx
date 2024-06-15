@@ -14,8 +14,8 @@ const ToggleTheme = (props) => {
   /**
    * Toggles the dark mode.
    */
-  const handleToggle = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
+  const handleToggle =async () => {
+   await setTheme(theme === 'light' ? 'dark' : 'light');
     if (theme === 'light') setThm(true);
     else setThm(false);
   };

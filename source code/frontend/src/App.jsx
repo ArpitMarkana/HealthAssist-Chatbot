@@ -13,6 +13,8 @@ const App = () => {
     if (!apiKey) {
       setModalOpen(true);
     }
+    if (localStorage.getItem('theme') === 'light') setThm(false);
+    
   }, []);
   return (
     <ChatContextProvider>
