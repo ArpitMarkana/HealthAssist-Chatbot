@@ -11,7 +11,6 @@ A healthcare chatbot designed to gather symptoms from users and provide potentia
 - [Running the Project](#running-the-project)
 - [Data and Model](#data-and-model)
 - [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 ## Prerequisites
@@ -80,10 +79,6 @@ The chatbot uses these resources to analyze the symptoms input by the user and p
 
 If you wish to contribute to the project, please fork the repository and create a pull request.
 
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ## Contact
 
-For further information or questions, feel free to contact the project team at [your_email@example.com].
+For further information or questions, feel free to contact the project team at arpitmarkana4887@gmail.com.
