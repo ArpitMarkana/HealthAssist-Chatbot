@@ -11,47 +11,45 @@ import Markdown from "./Markdown";
  * @param {Object} props - The properties for the component.
  */
 const Message = (props) => {
-  const { id, createdAt, text, ai = false, selected, showSatisfactionPrompt } = props.message;
-  const { onSatisfactionResponse } = props;
+  const { id, createdAt, text, ai = false, selected } = props.message;
+   
   
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleSatisfaction = (satisfied) => {
-    onSatisfactionResponse(id, satisfied);
-  };
+  
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
   const renderContent = () => {
-    if (showSatisfactionPrompt) {
-      return (
-        <div className={`flex items-end my-4 gap-2 mb-3 ${ai ? "flex-row-reverse justify-end" : "flex-row justify-end"}`}>
-          <div className={`w-screen overflow-hidden chat ${ai ? "chat-start" : "chat-end"}`}>
-            <div className="chat-bubble text-neutral-content">
-              <Markdown markdownText={text} />
-              <div className={`${ai ? "text-left" : "text-right"} text-xs`}>
-                {moment(createdAt).calendar()}
-              </div>
-              <div className="mt-3">
-              <button className="btn btn-sm btn-[tranparent]  rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(true)}>Yes</button>
-              <button className="btn btn-sm btn-[tranparent] rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(false)}>No</button>
-            </div></div>
+    // if (showSatisfactionPrompt) {
+    //   return (
+    //     <div className={`flex items-end my-4 gap-2 mb-3 ${ai ? "flex-row-reverse justify-end" : "flex-row justify-end"}`}>
+    //       <div className={`w-screen overflow-hidden chat ${ai ? "chat-start" : "chat-end"}`}>
+    //         <div className="chat-bubble text-neutral-content">
+    //           <Markdown markdownText={text} />
+    //           <div className={`${ai ? "text-left" : "text-right"} text-xs`}>
+    //             {moment(createdAt).calendar()}
+    //           </div>
+    //           <div className="mt-3">
+    //           <button className="btn btn-sm btn-[tranparent]  rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(true)}>Yes</button>
+    //           <button className="btn btn-sm btn-[tranparent] rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(false)}>No</button>
+    //         </div></div>
            
-          </div>
-          <div className="avatar">
-          <div className="w-8 border rounded-full border-slate-400">
-            {ai ? (
-              <MdComputer className="w-6 h-full m-auto" />
-            ) : (
-              <MdPerson className="w-6 h-full m-auto" />
-            )}
-          </div>
-        </div>
-        </div>
-      );
-    }
+    //       </div>
+    //       <div className="avatar">
+    //       <div className="w-8 border rounded-full border-slate-400">
+    //         {ai ? (
+    //           <MdComputer className="w-6 h-full m-auto" />
+    //         ) : (
+    //           <MdPerson className="w-6 h-full m-auto" />
+    //         )}
+    //       </div>
+    //     </div>
+    //     </div>
+    //   );
+    // }
 
     const maxLength = 400; // Maximum number of characters to show before truncating
 
@@ -99,8 +97,8 @@ Message.propTypes = {
     createdAt: PropTypes.number.isRequired,
     text: PropTypes.string,
     ai: PropTypes.bool,
-    selected: PropTypes.string,
-    showSatisfactionPrompt: PropTypes.bool.isRequired
+    selected: PropTypes.string
+   
   }).isRequired,
-  onSatisfactionResponse: PropTypes.func.isRequired
+  
 };

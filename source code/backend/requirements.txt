@@ -1,0 +1,9 @@
+# pip3 install -r requirements.txt
+ 
+flask===2.0.2
+  
+pandas===2.1.4
+ 
+Flask_Cors===4.0.1
+requests===2.32.3
+bs4===0.0.2

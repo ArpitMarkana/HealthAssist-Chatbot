@@ -18,7 +18,7 @@ const template = [
 const ChatView = ({thm}) => {
   const messagesEndRef = useRef();
   const inputRef = useRef();
-  const [formValue, setFormValue] = useState([]);
+  const [formValue, setFormValue] = useState("");
   const [thinking, setThinking] = useState(false);
   const [selected, setSelected] = useState(false);
    
@@ -71,72 +71,30 @@ const ChatView = ({thm}) => {
     }
     scrollToBottom();
   };
- 
-  const customStyles = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: thm ? '#1f2937' : '#f3f4f6', // Dark or light background
-      borderColor: thm ? '#374151' : '#e5e7eb',     // Dark or light border
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom text color
-      minHeight: '3rem',
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: thm ? '#1f2937' : '#f3f4f6', // Dark or light background
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom text color
-    }),
-    multiValue: (provided) => ({
-      ...provided,
-      backgroundColor: thm ? '#374151' : '#e5e7eb', // Dark or light background
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom text color
-    }),
-    multiValueLabel: (provided) => ({
-      ...provided,
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom text color
-    }),
-    multiValueRemove: (provided) => ({
-      ...provided,
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom text color
-      ':hover': {
-        backgroundColor: thm ? '#4b5563' : '#d1d5db', // Dark or light hover background
-        color: thm ? '#f9fafb' : '#1f2937',          // Dark or light text color
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? (thm ? '#374151' : '#d1d5db') : (thm ? '#1f2937' : '#f3f4f6'), // Selected or normal background
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom text color
-      ':hover': {
-        backgroundColor: thm ? '#4b5563' : '#d1d5db', // Dark or light hover background
-        color: '#f9fafb',           // Tailwind text color (gray-50)
-      },
-    }),
-    input: (provided) => ({
-      ...provided,
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom input text color
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: 'hsl(var(--nc) / var(--tw-text-opacity))', // Custom single value color
-    }),
-  };
-
+  
   const sendMessage = async (e) => {
     e.preventDefault();
-    const cleanPrompt = replaceProfanities(formValue.map(item => item.label).join(", "));
-    const req =  formValue.map(item => item.label);
+    const cleanPrompt = formValue;
+    if(!formValue) return;
+    if (formValue.trim().length == 0) return;
+    const req =  formValue ;
     const aiModel = selected;
-    const requestData = { symptoms: req };
+    const requestData = { inputs: req };
     flagRef.current = 0;
     setThinking(true);
-    setFormValue([]);
+    setFormValue("");
     await updateMessage(cleanPrompt, false, aiModel);
-
+      
     try {
      
-      const response = await axios.post('http://127.0.0.1:4000/predict/', requestData);
-      const { result, value_input, message } = response.data;
-
+      const response = await axios.post('https://api-inference.huggingface.co/models/Zabihin/Symptom_to_Diagnosis', {
+        inputs: req,
+      }, {
+        headers: { Authorization: `Bearer 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` }
+      });
+      console.log(response.data);
+      const result = response.data[0];
+      
       if (!result || !Array.isArray(result) || result.length === 0) {
         // Set state to true for empty response
        
@@ -149,7 +107,7 @@ const ChatView = ({thm}) => {
       for (let diagnosis of result) {
         if (flagRef.current === 1) break;
              
-        let trimmedDiagnose = diagnosis.diagnose.trim();
+        let trimmedDiagnose = diagnosis.label.trim();
         if (trimmedDiagnose.includes('\u000b')) {
           trimmedDiagnose = trimmedDiagnose.substring(0, trimmedDiagnose.indexOf('\u000b')).trim();
         }
@@ -187,8 +145,8 @@ const ChatView = ({thm}) => {
         flagRef.current = 1;
     }
 
-      console.log(value_input);
-      console.log(message);
+      
+      
     } catch (err) {
       console.error('Error:', err.message);
       window.alert(`Error: ${err.message}. Please try again later.`);
@@ -198,7 +156,7 @@ const ChatView = ({thm}) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter"&&flagRef.current) {
       sendMessage(e);
     }
   };
@@ -251,24 +209,21 @@ const ChatView = ({thm}) => {
         <span ref={messagesEndRef}></span>
       </section>
       <form className="flex flex-col px-10 mb-2 md:px-32 join sm:flex-row" onSubmit={sendMessage}>
-        <div className="flex items-stretch justify-between w-full">
-        <Select
-  ref={inputRef}
-  isMulti
-  options={symptomOptions}
-  className="w-full max-h-[20rem] bg-red dark:bg-light-grey"
-  value={formValue}
-  styles={customStyles}
-  onChange={(selectedOptions) => setFormValue(selectedOptions)}
-  placeholder="Enter symptoms"
-            menuPlacement="top"
-            isDisabled={flagRef.current === 0}
-/>
-          <button type="submit" className="join-item btn" disabled={formValue.length === 0}>
-            <MdSend size={30} />
-          </button>
-        </div>
-      </form>
+      <div className="flex items-stretch justify-between w-full">
+        <textarea
+          ref={inputRef}
+          className="w-full p-2 h-12 border mx-2 rounded-lg resize-y overflow-y-auto box-border disabled:bg-gray-200 dark:bg-light-grey disabled:cursor-not-allowed"
+          value={formValue}
+          onChange={(e) => setFormValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Enter symptoms"
+          isdisabled={flagRef.current === 0}
+        />
+        <button type="submit" className="join-item btn-md btn" disabled={(formValue.trim() === '')||flagRef.current === 0}>
+          <MdSend size={30} />
+        </button>
+      </div>
+    </form>
     </main>
   );
 };
