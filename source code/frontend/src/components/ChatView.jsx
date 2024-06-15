@@ -71,7 +71,19 @@ const ChatView = ({thm}) => {
     }
     scrollToBottom();
   };
-  
+  useEffect(() => {
+    autoGrow(); // Adjust height on initial render
+  }, [formValue]);
+  const autoGrow = () => {
+    const element = inputRef.current;
+    if (formValue == '') {
+      element.style.height = 48 + 'px';
+    }
+    if (element) {
+       
+      element.style.height = element.scrollHeight + 'px';
+    }
+  };
   const sendMessage = async (e) => {
     e.preventDefault();
     const cleanPrompt = formValue;
@@ -154,6 +166,21 @@ const ChatView = ({thm}) => {
     
     setThinking(false);
   };
+  useEffect(() => {
+    const preloadModel = async () => {
+      try {
+        await axios.post('https://api-inference.huggingface.co/models/Zabihin/Symptom_to_Diagnosis', {
+          inputs: "Preload"
+        }, {
+          headers: { Authorization: `Bearer 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` }
+        });
+        console.log("Model preloaded successfully");
+      } catch (error) {
+        console.error("Error preloading model:", error.message);
+      }
+    };
+    preloadModel();
+  }, []);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter"&&flagRef.current) {
@@ -209,16 +236,19 @@ const ChatView = ({thm}) => {
         <span ref={messagesEndRef}></span>
       </section>
       <form className="flex flex-col px-10 mb-2 md:px-32 join sm:flex-row" onSubmit={sendMessage}>
-      <div className="flex items-stretch justify-between w-full">
-        <textarea
-          ref={inputRef}
-          className="w-full p-2 h-12 border mx-2 rounded-lg resize-y overflow-y-auto box-border disabled:bg-gray-200 dark:bg-light-grey disabled:cursor-not-allowed"
-          value={formValue}
-          onChange={(e) => setFormValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Enter symptoms"
-          isdisabled={flagRef.current === 0}
-        />
+      <div className="flex justify-between w-full items-end">
+      <textarea
+      ref={inputRef}
+      className="w-full p-[0.6rem] min-h-12 h-12 border mx-2 rounded-lg resize-none overflow-y-auto box-border dark:bg-light-grey disabled:cursor-not-allowed"
+      value={formValue}
+      onChange={(e) => {
+        setFormValue(e.target.value);
+        autoGrow(); // Adjust height on change
+      }}
+      onKeyDown={handleKeyDown}
+      placeholder="Enter symptoms"
+      disabled={flagRef.current === 0}
+    />
         <button type="submit" className="join-item btn-md btn" disabled={(formValue.trim() === '')||flagRef.current === 0}>
           <MdSend size={30} />
         </button>
