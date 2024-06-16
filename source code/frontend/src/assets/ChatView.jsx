@@ -89,7 +89,7 @@ const ChatView = ({ thm }) => {
 
   useEffect(() => {
     slowScrollToBottom();
-  }, [thinking, messages]);
+  }, [messages]);
 
   useEffect(() => {
     inputRef.current.focus();

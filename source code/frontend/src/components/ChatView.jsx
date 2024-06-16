@@ -77,7 +77,7 @@ const ChatView = ({thm}) => {
   const autoGrow = () => {
     const element = inputRef.current;
     if (formValue == '') {
-      element.style.height = 48 + 'px';
+    if(element)  element.style.height = 48 + 'px';
     }
     if (element) {
        
@@ -154,7 +154,7 @@ const ChatView = ({thm}) => {
           aiModel,
           false
         );
-        flagRef.current = 1;
+        
     }
 
       
@@ -166,6 +166,7 @@ const ChatView = ({thm}) => {
     
     setThinking(false);
   };
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const preloadModel = async () => {
       try {
@@ -177,6 +178,10 @@ const ChatView = ({thm}) => {
         console.log("Model preloaded successfully");
       } catch (error) {
         console.error("Error preloading model:", error.message);
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 5000); // 5-second wait time
       }
     };
     preloadModel();
@@ -189,11 +194,11 @@ const ChatView = ({thm}) => {
   };
 
   useEffect(() => {
-    slowScrollToBottom();
+    
   }, [thinking, messages]);
 
   useEffect(() => {
-    inputRef.current.focus();
+   if(inputRef.current) inputRef.current.focus();
   }, []);
 
   const Compo = () => {
@@ -235,27 +240,34 @@ const ChatView = ({thm}) => {
         {thinking && <Thinking />}
         <span ref={messagesEndRef}></span>
       </section>
-      <form className="flex flex-col px-10 mb-2 md:px-32 join sm:flex-row" onSubmit={sendMessage}>
-      <div className="flex justify-between w-full items-end">
-      <textarea
-      ref={inputRef}
-      className="w-full p-[0.6rem] min-h-12 h-12 border mx-2 rounded-lg resize-none overflow-y-auto box-border dark:bg-light-grey disabled:cursor-not-allowed"
-      value={formValue}
-      onChange={(e) => {
-        setFormValue(e.target.value);
-        autoGrow(); // Adjust height on change
-      }}
-      onKeyDown={handleKeyDown}
-      placeholder="Enter symptoms"
-      disabled={flagRef.current === 0}
-    />
-        <button type="submit" className="join-item btn-md btn" disabled={(formValue.trim() === '')||flagRef.current === 0}>
-          <MdSend size={30} />
-        </button>
-      </div>
-    </form>
+      {loading ? (
+        <div className="flex justify-center items-center h-20">
+          <p>Loading model, please wait...</p>
+        </div>
+      ) : (
+        <form className="flex flex-col px-10 mb-2 md:px-32 join sm:flex-row" onSubmit={sendMessage}>
+          <div className="flex justify-between w-full items-end">
+            <textarea
+              ref={inputRef}
+              className="w-full p-[0.6rem] min-h-12 h-12 border mx-2 rounded-lg resize-none overflow-y-auto box-border dark:bg-light-grey disabled:cursor-not-allowed"
+              value={formValue}
+              onChange={(e) => {
+                setFormValue(e.target.value);
+                autoGrow(); // Adjust height on change
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="Enter symptoms"
+              disabled={flagRef.current === 0}
+            />
+            <button type="submit" className="join-item btn-md btn" disabled={(formValue.trim() === '') || flagRef.current === 0}>
+              <MdSend size={30} />
+            </button>
+          </div>
+        </form>
+      )}
     </main>
   );
+  
 };
 
 export default ChatView;

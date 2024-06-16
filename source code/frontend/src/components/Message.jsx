@@ -1,27 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { MdComputer, MdPerson } from "react-icons/md";
 import moment from "moment";
 import Image from "./Image";
 import Markdown from "./Markdown";
 
-/**
- * A chat message component that displays a message with a timestamp and an icon.
- *
- * @param {Object} props - The properties for the component.
- */
 const Message = (props) => {
   const { id, createdAt, text, ai = false, selected, showSatisfactionPrompt } = props.message;
   const { onSatisfactionResponse } = props;
-  
+
   const [isExpanded, setIsExpanded] = useState(false);
+  // Function to toggle expand/collapse
+  const toggleExpand = () => {
+    localStorage.setItem(`message_${id}`, JSON.stringify(!isExpanded))
+    setIsExpanded(!isExpanded);
+   ;
+  };
+
+  // Effect to load from localStorage on component mount
+  useEffect( () => {
+    const storedState =  localStorage.getItem(`message_${id}`);
+    if (storedState) {
+   setIsExpanded(JSON.parse(storedState));
+    }
+    else{
+      localStorage.setItem(`message_${id}`, JSON.stringify(isExpanded));
+    }
+  }, [id]);
+   
+
+  // Effect to save expanded state to localStorage when it changes
+   
 
   const handleSatisfaction = (satisfied) => {
     onSatisfactionResponse(id, satisfied);
-  };
-
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
   };
 
   const renderContent = () => {
@@ -35,20 +47,20 @@ const Message = (props) => {
                 {moment(createdAt).calendar()}
               </div>
               <div className="mt-3">
-              <button className="btn btn-sm btn-[tranparent]  rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(true)}>Yes</button>
-              <button className="btn btn-sm btn-[tranparent] rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(false)}>No</button>
-            </div></div>
-           
+                <button className="btn btn-sm btn-[tranparent]  rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(true)}>Yes</button>
+                <button className="btn btn-sm btn-[tranparent] rounded-md border-1 border-slate-500 w-[3rem] m-2" onClick={() => handleSatisfaction(false)}>No</button>
+              </div>
+            </div>
           </div>
           <div className="avatar">
-          <div className="w-8 border rounded-full border-slate-400">
-            {ai ? (
-              <MdComputer className="w-6 h-full m-auto" />
-            ) : (
-              <MdPerson className="w-6 h-full m-auto" />
-            )}
+            <div className="w-8 border rounded-full border-slate-400">
+              {ai ? (
+                <MdComputer className="w-6 h-full m-auto" />
+              ) : (
+                <MdPerson className="w-6 h-full m-auto" />
+              )}
+            </div>
           </div>
-        </div>
         </div>
       );
     }
@@ -100,7 +112,7 @@ Message.propTypes = {
     text: PropTypes.string,
     ai: PropTypes.bool,
     selected: PropTypes.string,
-    showSatisfactionPrompt: PropTypes.bool.isRequired
+    showSatisfactionPrompt: PropTypes.bool.isRequired,
   }).isRequired,
-  onSatisfactionResponse: PropTypes.func.isRequired
+  onSatisfactionResponse: PropTypes.func.isRequired,
 };
